@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
+import ToggleTailwind from "./ToggleButton";
 
 const InterfaceUi = () => {
   const [currentPlayer, setCurrentPlayer] = useState<boolean>(false); // false = Human (X), true = Computer (O)
   const [winner, setWinner] = useState<string | null>(null);
   const boxesRef = useRef<(HTMLDivElement | null)[]>([]);
-
+  const [isUnbeatable, setIsUnbeatable] = useState(true);
+  const [enabled, setEnabled] = useState(false);
   const startGame = () => {
     setWinner(null);
     setCurrentPlayer(false);
@@ -99,6 +101,20 @@ const InterfaceUi = () => {
 
   //     computerPlay(smartMove);
   //   };
+
+  // const generateSmartMove = () => {
+  //   const board = boxesRef.current.map((box) => box?.innerText || "");
+  //   const emptyIndexes = board
+  //     .map((val, i) => (!val ? i : null))
+  //     .filter((i) => i !== null) as number[];
+
+  //   if (emptyIndexes.length === 0 || winner) return;
+
+  //   const bestMove = getBestMove(board, "O"); // "O" is computer
+  //   if (typeof bestMove === "number") {
+  //     computerPlay(bestMove);
+  //   }
+  // };
   const generateSmartMove = () => {
     const board = boxesRef.current.map((box) => box?.innerText || "");
     const emptyIndexes = board
@@ -107,9 +123,16 @@ const InterfaceUi = () => {
 
     if (emptyIndexes.length === 0 || winner) return;
 
-    const bestMove = getBestMove(board, "O"); // "O" is computer
-    if (typeof bestMove === "number") {
-      computerPlay(bestMove);
+    if (isUnbeatable) {
+      const bestMove = getBestMove(board, "O");
+      if (typeof bestMove === "number") {
+        computerPlay(bestMove);
+      }
+    } else {
+      // Beatable: simple random or smart priority
+      const move =
+        emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)];
+      computerPlay(move);
     }
   };
 
@@ -182,12 +205,22 @@ const InterfaceUi = () => {
         <h1 className="text-5xl font-extrabold tracking-widest drop-shadow-lg animate-pulse">
           Tic Tac Toe
         </h1>
-        <button
-          onClick={startGame}
-          className="px-6 py-2 bg-white text-purple-600 font-bold rounded-full shadow-md hover:bg-purple-100 hover:scale-105 transition duration-300"
-        >
-          Restart Game
-        </button>
+        <div className="flex gap-4 items-center justify-center">
+          <button
+            onClick={startGame}
+            className="px-6 py-2 bg-white text-purple-600 font-bold rounded-full shadow-md hover:bg-purple-100 hover:scale-105 transition duration-300"
+          >
+            Restart Game
+          </button>
+          <button
+            onClick={() => setIsUnbeatable(!isUnbeatable)}
+            className={`px-6 py-2  font-bold rounded-full shadow-md hover:bg-purple-100 hover:scale-105 transition duration-300 ${
+              isUnbeatable ? "bg-red-600" : "bg-white text-black"
+            }`}
+          >
+            {isUnbeatable ? "Unbeatable Mode" : "Normal Mode"}
+          </button>
+        </div>
       </div>
 
       <div className="w-[90%] max-w-2xl flex justify-between items-center text-white p-4 bg-white/20 backdrop-blur-md rounded-xl shadow-xl mb-8">
@@ -217,7 +250,7 @@ const InterfaceUi = () => {
         )}
       </div>
 
-      <div className="w-[90vw] max-w-[500px] grid grid-cols-3 gap-3 p-4 bg-white/20 backdrop-blur-lg rounded-2xl shadow-xl">
+<div className= {`w-[90vw] max-w-[500px] grid grid-cols-3 gap-3 p-4 bg-white/20 backdrop-blur-lg rounded-2xl shadow-xl `}>
         {Array.from({ length: 9 }).map((_, index) => (
           <div
             key={index}
@@ -225,7 +258,7 @@ const InterfaceUi = () => {
               boxesRef.current[index] = el;
             }}
             onClick={() => !currentPlayer && humanPlay(index)}
-            className="h-[100px] sm:h-[120px] flex items-center justify-center text-4xl sm:text-5xl font-extrabold bg-white/60 text-purple-700 rounded-lg shadow-md cursor-pointer transition-transform hover:scale-105 active:scale-95"
+            className="h-[100px] sm:h-[120px] flex items-center justify-center text-4xl sm:text-5xl font-extrabold bg-white/60  text-purple-700 rounded-lg shadow-md cursor-pointer transition-transform hover:scale-105 active:scale-95"
           ></div>
         ))}
       </div>
