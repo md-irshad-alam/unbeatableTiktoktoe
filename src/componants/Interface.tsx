@@ -221,7 +221,9 @@ const InterfaceUi = () => {
         {Array.from({ length: 9 }).map((_, index) => (
           <div
             key={index}
-            ref={(el) => (boxesRef.current[index] = el)}
+            ref={(el: HTMLDivElement | null) => {
+              boxesRef.current[index] = el;
+            }}
             onClick={() => !currentPlayer && humanPlay(index)}
             className="h-[100px] sm:h-[120px] flex items-center justify-center text-4xl sm:text-5xl font-extrabold bg-white/60 text-purple-700 rounded-lg shadow-md cursor-pointer transition-transform hover:scale-105 active:scale-95"
           ></div>
